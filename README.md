@@ -1,4 +1,4 @@
-# 💾 Homelab
+# 🏠Homelab
 
 ## Introduction
 
