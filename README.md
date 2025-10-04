@@ -13,14 +13,6 @@ The goals are learning and enjoyment. As a DevOps engineer I work with Kubernete
 * TrueNAS backed storage with NFS CSI for dynamic provisioning
 * Prometheus and Grafana for metrics and dashboards
 
-## Cluster provisioning and architecture
-
-| Number | Name   | Description                                                                                                   |
-|-------:|--------|---------------------------------------------------------------------------------------------------------------|
-| 1      | Noia   | End user applications. Stateless by design and provisioned from code. Reprovisionable in minutes.             |
-| 2      | Data   | Databases and stateful workloads. Multi node. Restorable from object storage snapshots.                        |
-| 3      | Zurich | Private cluster provisioned from a private repository.                                                         |
-
 ## 🚀 Installed apps and tools
 
 ### End user applications
