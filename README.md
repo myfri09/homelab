@@ -2,31 +2,63 @@
 
 ## Introduction
 
-This repo contains all of the configuration and documentation of my homelab.
+This repository contains the configuration and documentation of my homelab.
 
-The purpose of my homelab is to learn and to have fun. Being a Cloud Native Engineer by trade, I work with Kubernetes every day, and my homelab is the place where I can try out and learn new things. On the other hand, by self-hosting some applications, it makes me feel responsible for the entire process of deploying and maintaining an application from A to Z. It forces me to think about backup strategies, security, scalability and the ease of deployment and maintenance.
+The goals are learning and enjoyment. As a DevOps engineer I work with Kubernetes daily, and this homelab is where I explore new ideas. Self-hosting selected applications keeps me accountable for the entire lifecycle from deployment to operations, which encourages clear thinking around backups, security, scalability and maintainability.
 
-## Cluster Provisioning & Architecture
+## At a glance
 
-<table>
-    <tr>
-        <th>Number</th>
-        <th>Name</th>
-        <th>Description</th>
-    </tr>
-    <tr>
-    <td>1</td>
-    <td>Noia</td>
-        <td>Contains all end-user applications. Stateless, fully provisioned from code. Can be torn down and spun up within minutes on different hardware.</td>
-    </tr>
-    <tr>
-        <td>2</td>
-    <td>Data</td>
-        <td>Contains all my databases & state. Multi-node. Can be fully restored from Blob storage.</td>
-    </tr>
-    <tr>
-        <td>3</td>
-    <td>Zurich</td>
-        <td>Private cluster provisioned from private repository.</td>
-    </tr>
-</table>
+* Kubernetes with GitOps driven operations
+* Cloudflare Tunnels for secure remote access
+* TrueNAS backed storage with NFS CSI for dynamic provisioning
+* Prometheus and Grafana for metrics and dashboards
+
+## Cluster provisioning and architecture
+
+| Number | Name   | Description                                                                                                   |
+|-------:|--------|---------------------------------------------------------------------------------------------------------------|
+| 1      | Noia   | End user applications. Stateless by design and provisioned from code. Reprovisionable in minutes.             |
+| 2      | Data   | Databases and stateful workloads. Multi node. Restorable from object storage snapshots.                        |
+| 3      | Zurich | Private cluster provisioned from a private repository.                                                         |
+
+## 🚀 Installed apps and tools
+
+### End user applications
+
+| Name | Description |
+|------|-------------|
+| [Linkding](https://linkding.link) | Bookmark Manager |
+| [Homarr](https://homarr.dev) | Personal start page for my homelab and the web |
+| [Wallabag](https://wallabag.org/) | Save and read content later |
+| [n8n](https://n8n.io/) | Secure and AI aware workflow automation |
+
+
+### Platform and operations
+
+| Name | Description |
+|------|-------------|
+| [Flux CD](https://fluxcd.io/) | GitOps engine that fits my workflows |
+| [Cilium](https://cilium.io/) | eBPF networking, observability and security |
+| [Grafana](https://grafana.com/) | Observability dashboards |
+| [Prometheus](https://prometheus.io/) | Metrics and alerting backend |
+| [Cloudflare Zero Trust](https://developers.cloudflare.com/cloudflare-one/) | Private tunnels for selected services |
+| [NFS CSI Driver](https://github.com/kubernetes-csi/csi-driver-nfs) | Dynamic NFS provisioning backed by TrueNAS exports |
+
+## Networking
+
+Kubernetes runs Cilium as the CNI. Service addresses are allocated with Cilium LoadBalancer IPAM. The ingress layer uses the Cilium Gateway API, which avoids operating a separate ingress controller. At the edge I use a UniFi Cloud Gateway Fiber with VLANs and strict traffic rules.
+
+## Storage
+
+Primary NAS is a TrueNAS system.
+
+* Kubernetes dynamic provisioning uses the NFS CSI driver backed by TrueNAS exports.
+* A separate NFS share serves data that must be shared across clusters.
+
+## Operations
+
+### GitOps and environments
+
+* Flux manages all clusters from this repository.
+* Changes land through pull requests, then Flux reconciles them.
+
