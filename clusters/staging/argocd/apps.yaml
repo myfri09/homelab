@@ -1,3 +1,80 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infra-kubernetes-dashboard
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubernetes-dashboard
+  source:
+    repoURL: https://kubernetes.github.io/dashboard
+    chart: kubernetes-dashboard
+    targetRevision: 7.10.1
+    helm:
+      values: |
+        kong:
+          enabled: true
+          proxy:
+            http:
+              enabled: false
+            tls:
+              enabled: true
+        metricsScraper:
+          enabled: true
+        app:
+          settings:
+            clusterName: Homelab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infra-kubernetes-dashboard-rbac
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubernetes-dashboard
+  source:
+    repoURL: https://github.com/myfri09/homelab
+    targetRevision: main # antes ponía HEAD
+    path: infrastructure/staging/kubernetes-dashboard
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 2m
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -23,12 +100,22 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 2m
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: homarr-staging
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -46,12 +133,22 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 2m
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: linkding-staging
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -69,3 +166,11 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
+      - ServerSideApply=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 2m
