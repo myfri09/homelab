@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: homarr
-annotations:
-  argocd.argoproj.io/sync-wave: "3"
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   replicas: 1
   selector:
@@ -21,20 +21,18 @@ spec:
           ports:
             - containerPort: 7575
           env:
-        - name: SECRET_ENCRYPTION_KEY
-          valueFrom:
-            secretKeyRef:
-              name: homarr-secrets
-              key: SECRET_ENCRYPTION_KEY
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: homarr-secrets
-              key: DATABASE_PASSWORD
-              optional: false
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: homarr-secrets
-              key: JWT_SECRET
-              optional: false
+            - name: SECRET_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: homarr-secrets
+                  key: SECRET_ENCRYPTION_KEY
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homarr-secrets
+                  key: DATABASE_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: homarr-secrets
+                  key: JWT_SECRET
