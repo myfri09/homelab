@@ -95,10 +95,9 @@ spec:
       values: |
         installCRDs: true
         webhook:
-          enabled: false
+          enabled: true
         certController:
-          enabled: false
-        replicaCount: 1
+          enabled: true
   syncPolicy:
     automated:
       prune: true
