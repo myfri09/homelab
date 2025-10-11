@@ -12,11 +12,31 @@ spec:
       labels:
         app: linkding
     spec:
+      serviceAccountName: linkding-sa
       containers:
         - name: linkding
           image: sissbruecker/linkding:latest
           ports:
             - containerPort: 9090
+          env:
+        - name: SECRET_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: linkding-secrets
+              key: SECRET_ENCRYPTION_KEY
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: linkding-secrets
+              key: POSTGRES_PASSWORD
+              optional: true
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: linkding-secrets
+              key: REDIS_PASSWORD
+              optional: true
+
           volumeMounts:
             - name: linkding-data
               mountPath: /etc/linkding/data
