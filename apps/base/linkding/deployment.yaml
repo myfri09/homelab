@@ -31,11 +31,6 @@ spec:
                 secretKeyRef:
                   name: linkding-secrets
                   key: POSTGRES_PASSWORD
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: linkding-secrets
-                  key: REDIS_PASSWORD
           volumeMounts:
             - name: linkding-data
               mountPath: /etc/linkding/data
