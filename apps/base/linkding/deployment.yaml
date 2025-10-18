@@ -26,14 +26,21 @@ spec:
                 secretKeyRef:
                   name: linkding-secrets
                   key: SECRET_ENCRYPTION_KEY
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: linkding-secrets
-                  key: POSTGRES_PASSWORD
           volumeMounts:
             - name: linkding-data
               mountPath: /etc/linkding/data
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 9090
+            initialDelaySeconds: 30
+            periodSeconds: 20
       volumes:
         - name: linkding-data
           persistentVolumeClaim:

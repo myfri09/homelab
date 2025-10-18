@@ -8,10 +8,30 @@ The goals are learning and enjoyment. As a DevOps engineer I work with Kubernete
 
 ## At a glance
 
-* Kubernetes with GitOps driven operations
-* Cloudflare Tunnels for secure remote access
-* TrueNAS backed storage with NFS CSI for dynamic provisioning
-* Prometheus and Grafana for metrics and dashboards
+- Kubernetes with GitOps driven operations
+- Cloudflare Tunnels for secure remote access
+- TrueNAS backed storage with NFS CSI for dynamic provisioning
+- Prometheus and Grafana for metrics and dashboards
+
+## Prerequisites
+
+- K3s cluster
+- kubectl configured
+- Git repository access
+
+#### Initial Setup
+
+##### 1. Install ArgoCD
+
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+##### 2.Get ArgoCD Password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+##### 3. Deploy Root Application
+kubectl apply -f clusters/staging/argocd/root-app.yaml
 
 ## 🚀 Installed apps and tools
 
@@ -54,3 +74,4 @@ Primary NAS is a TrueNAS system.
 * Flux manages all clusters from this repository.
 * Changes land through pull requests, then Flux reconciles them.
 
+```

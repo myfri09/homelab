@@ -1,4 +1,5 @@
 ---
+# ArgoCD
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -28,6 +29,112 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
+# MetalLB
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-29"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://metallb.github.io/metallb
+    chart: metallb
+    targetRevision: 0.14.*
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+# MetalLB config
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-28"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://github.com/myfri09/homelab
+    targetRevision: main
+    path: infrastructure/staging/metallb/config
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+# Local Path Provisioner
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-provisioner
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-26"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: local-path-storage
+  source:
+    repoURL: https://charts.rancher.io
+    chart: local-path-provisioner
+    targetRevision: 0.0.*
+    helm:
+      values: |
+        storageClass:
+          defaultClass: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+# Traefik
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-27"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  source:
+    repoURL: https://traefik.github.io/charts
+    chart: traefik
+    targetRevision: 32.*
+    helm:
+      values: |
+        service:
+          type: LoadBalancer
+        ingressClass:
+          enabled: true
+          isDefaultClass: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+# Vault
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -80,6 +187,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
+# ESO
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -111,6 +219,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
 ---
+# Dashboard
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -129,18 +238,13 @@ spec:
     targetRevision: 7.13.*
     helm:
       values: |
-        kong:
-          enabled: true
-          proxy:
-            http:
-              enabled: false
-            tls:
-              enabled: true
         metricsScraper:
           enabled: true
         app:
           settings:
             clusterName: Homelab
+        kong:
+          enabled: false
         ingress:
           enabled: true
           ingressClassName: traefik
@@ -154,6 +258,27 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard-rbac
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/myfri09/homelab
+    targetRevision: main
+    path: infrastructure/staging/kubernetes-dashboard
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+# Ingress
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

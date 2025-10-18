@@ -26,13 +26,31 @@ spec:
                 secretKeyRef:
                   name: homarr-secrets
                   key: SECRET_ENCRYPTION_KEY
-            - name: DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: homarr-secrets
-                  key: DATABASE_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: homarr-secrets
                   key: JWT_SECRET
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7575
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7575
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: homarr-data
+              mountPath: /app/data/configs
+              subPath: configs
+            - name: homarr-data
+              mountPath: /app/public/icons
+              subPath: icons
+      volumes:
+        - name: homarr-data
+          persistentVolumeClaim:
+            claimName: homarr-data-pvc
