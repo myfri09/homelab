@@ -4,6 +4,6 @@ namespace: homarr
 resources:
   - ../../base/homarr/
   - service-account.yaml
-  - secret-store.yaml
-  - external-secret.yaml
+  #  - secret-store.yaml
+  #  - external-secret.yaml
   - ingress.yaml

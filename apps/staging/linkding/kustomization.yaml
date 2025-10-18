@@ -4,6 +4,6 @@ namespace: linkding
 resources:
   - ../../base/linkding/
   - service-account.yaml
-  - secret-store.yaml
-  - external-secret.yaml
+  #  - secret-store.yaml
+  #  - external-secret.yaml
   - ingress.yaml
