@@ -49,7 +49,7 @@ kubectl apply -f clusters/staging/argocd/root-app.yaml
 
 | Name | Description |
 |------|-------------|
-| [Flux CD](https://fluxcd.io/) | GitOps engine that fits my workflows |
+| [ArgoCD](https://fluxcd.io/) | GitOps engine that fits my workflows |
 | [Cilium](https://cilium.io/) | eBPF networking, observability and security |
 | [Grafana](https://grafana.com/) | Observability dashboards |
 | [Prometheus](https://prometheus.io/) | Metrics and alerting backend |
@@ -72,6 +72,6 @@ Primary NAS is a TrueNAS system.
 ### GitOps and environments
 
 * Flux manages all clusters from this repository.
-* Changes land through pull requests, then Flux reconciles them.
+* Changes land through pull requests, then ArgoCD reconciles them.
 
 ```
