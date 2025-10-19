@@ -7,4 +7,3 @@ resources:
   - secret-store.yaml
   - external-secret.yaml
   - ingress.yaml
-  - vault-token-secret.yaml
