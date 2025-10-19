@@ -1,3 +1,17 @@
+# Sync Wave Order:
+# -50: Priority Storage Classes
+# -40: MetalLB (Load Balancer)
+# -35: Local Path Provisioner
+# -30: Cert-Manager (TLS Certificates)
+# -25: Traefik (Ingress Controller)
+# -20: Vault (Secrets Management)
+# -15: External Secrets Operator
+# -10: External Secret Stores
+# -5:  Monitoring Stack
+# 0:   Kubernetes Dashboard
+# 5:   Backup Solutions
+# 10:  Applications
+
 ---
 # MetalLB
 apiVersion: argoproj.io/v1alpha1
@@ -6,7 +20,7 @@ metadata:
   name: metallb
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-29"
+    argocd.argoproj.io/sync-wave: "-40"
 spec:
   project: default
   destination:
@@ -22,15 +36,22 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/conversion/webhook/clientConfig/caBundle
+
 ---
-# MetalLB config
+# MetalLB Configuration
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: metallb-config
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-28"
+    argocd.argoproj.io/sync-wave: "-39"
 spec:
   project: default
   destination:
@@ -44,6 +65,13 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
 ---
 # Local Path Provisioner
 apiVersion: argoproj.io/v1alpha1
@@ -72,6 +100,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 ---
 # Traefik
 apiVersion: argoproj.io/v1alpha1
@@ -103,6 +132,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 ---
 # Vault
 apiVersion: argoproj.io/v1alpha1
@@ -156,6 +186,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 ---
 # ESO
 apiVersion: argoproj.io/v1alpha1
@@ -188,6 +219,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
 ---
 # Dashboard
 apiVersion: argoproj.io/v1alpha1
@@ -227,6 +259,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -247,6 +280,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
 ---
 # Ingress
 apiVersion: argoproj.io/v1alpha1

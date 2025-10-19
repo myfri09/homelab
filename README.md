@@ -1,77 +1,74 @@
-# 🏠 Homelab
+# Homelab GitOps with Talos
 
-## Introduction
+GitOps-driven homelab infrastructure running on Talos Linux.
 
-This repository contains the configuration and documentation of my homelab.
-
-The goals are learning and enjoyment. As a DevOps engineer I work with Kubernetes daily, and this homelab is where I explore new ideas. Self-hosting selected applications keeps me accountable for the entire lifecycle from deployment to operations, which encourages clear thinking around backups, security, scalability and maintainability.
-
-## At a glance
-
-- Kubernetes with GitOps driven operations
-- Cloudflare Tunnels for secure remote access
-- TrueNAS backed storage with NFS CSI for dynamic provisioning
-- Prometheus and Grafana for metrics and dashboards
-
-## Prerequisites
-
-- K3s cluster
-- kubectl configured
-- Git repository access
-
-#### Initial Setup
-
-##### 1. Install ArgoCD
-
+## Quick Start
 ```bash
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+# Prerequisites: Talos cluster running, kubectl configured
 
-##### 2.Get ArgoCD Password
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+# 1. Clone repository
+git clone https://github.com/myfri09/homelab
+cd homelab
 
-##### 3. Deploy Root Application
-kubectl apply -f clusters/staging/argocd/root-app.yaml
+# 2. Make scripts executable
+chmod +x bootstrap/*.sh
 
-## 🚀 Installed apps and tools
+# 3. Run bootstrap
+make bootstrap
 
-### End user applications
+# 4. Wait for infrastructure to deploy (~5 minutes)
+kubectl get pods -A -w
 
-| Name | Description |
-|------|-------------|
-| [Linkding](https://linkding.link) | Bookmark Manager |
-| [Homarr](https://homarr.dev) | Personal start page for my homelab and the web |
-| [Wallabag](https://wallabag.org/) | Save and read content later |
-| [n8n](https://n8n.io/) | Secure and AI aware workflow automation |
+# 5. Initialize Vault (after it's running)
+make vault-init
 
+# 6. Update vault tokens in:
+# - apps/overlays/homarr/vault-token-secret.yaml
+# - apps/overlays/linkding/vault-token-secret.yaml
 
-### Platform and operations
+# 7. Apply the updated secrets
+kubectl apply -f apps/overlays/homarr/vault-token-secret.yaml
+kubectl apply -f apps/overlays/linkding/vault-token-secret.yaml
 
-| Name | Description |
-|------|-------------|
-| [ArgoCD](https://fluxcd.io/) | GitOps engine that fits my workflows |
-| [Cilium](https://cilium.io/) | eBPF networking, observability and security |
-| [Grafana](https://grafana.com/) | Observability dashboards |
-| [Prometheus](https://prometheus.io/) | Metrics and alerting backend |
-| [Cloudflare Zero Trust](https://developers.cloudflare.com/cloudflare-one/) | Private tunnels for selected services |
-| [NFS CSI Driver](https://github.com/kubernetes-csi/csi-driver-nfs) | Dynamic NFS provisioning backed by TrueNAS exports |
-
-## Networking
-
-Kubernetes runs Cilium as the CNI. Service addresses are allocated with Cilium LoadBalancer IPAM. The ingress layer uses the Cilium Gateway API, which avoids operating a separate ingress controller. At the edge I use a UniFi Cloud Gateway Fiber with VLANs and strict traffic rules.
-
-## Storage
-
-Primary NAS is a TrueNAS system.
-
-* Kubernetes dynamic provisioning uses the NFS CSI driver backed by TrueNAS exports.
-* A separate NFS share serves data that must be shared across clusters.
-
-## Operations
-
-### GitOps and environments
-
-* Flux manages all clusters from this repository.
-* Changes land through pull requests, then ArgoCD reconciles them.
-
+# 8. Check status
+make status
 ```
+
+## Access URLs
+
+- ArgoCD: http://argocd.myfri09.lan (password: `make get-password`)
+- Vault: http://vault.myfri09.lan
+- Dashboard: http://dashboard.myfri09.lan
+- Homarr: http://homarr.myfri09.lan
+- Linkding: http://linkding.myfri09.lan
+
+## DNS Configuration
+
+Add these entries to your DNS server or /etc/hosts:
+argocd.myfri09.lan
+vault.myfri09.lan
+dashboard.myfri09.lan
+homarr.myfri09.lan
+linkding.myfri09.lan
+
+Replace 10.0.0.240 with the actual IP assigned by MetalLB (check with `make get-metallb-ip`)
+
+## Useful Commands
+```bash
+make help           # Show all commands
+make status         # Check application status
+make sync           # Force sync all apps
+make port-forward   # Access ArgoCD locally
+make logs           # View ArgoCD logs
+make test-apps      # Test application endpoints
+```
+
+## Directory Structure
+.
+├── apps/
+│   ├── base/          # Base application configs
+│   └── overlays/      # Environment overlays
+├── bootstrap/         # Bootstrap scripts
+├── clusters/         # Cluster configurations
+├── infrastructure/   # Infrastructure components
+└── Makefile         # Automation commands
