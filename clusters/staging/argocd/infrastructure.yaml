@@ -178,6 +178,10 @@ spec:
               storage "file" {
                 path = "/vault/data"
               }
+          # FIX: Disable affinity rules for Talos compatibility
+          affinity: ""
+          tolerations: []
+          nodeSelector: {}
         ui:
           enabled: true
   syncPolicy:
