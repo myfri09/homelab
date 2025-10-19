@@ -43,11 +43,11 @@ check_prerequisites() {
         exit 1
     fi
 
-    # Fixed: Trim whitespace from the count
+    # Fixed: Handle the comparison properly
     NOT_READY=$(kubectl get nodes --no-headers | grep -v " Ready " | wc -l | tr -d ' ')
 
-    if [ "$NOT_READY" -gt 0 ]; then
-        error "Not all nodes are ready. $NOT_READY nodes are not ready."
+    if [ "${NOT_READY}" != "0" ]; then
+        error "Not all nodes are ready. ${NOT_READY} nodes are not ready."
         kubectl get nodes
         exit 1
     fi
