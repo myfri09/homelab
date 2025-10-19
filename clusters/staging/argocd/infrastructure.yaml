@@ -179,9 +179,15 @@ spec:
                 path = "/vault/data"
               }
           # FIX: Disable affinity rules for Talos compatibility
-          affinity: ""
-          tolerations: []
+          affinity: {}
           nodeSelector: {}
+          tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
+          - key: "node-role.kubernetes.io/master"
+            operator: "Exists"
+            effect: "NoSchedule"
         ui:
           enabled: true
   syncPolicy:
