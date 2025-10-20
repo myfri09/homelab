@@ -13,6 +13,31 @@
 # 10:  Applications
 
 ---
+# MetalLB Namespace
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-ns
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-41"
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb-system
+  source:
+    repoURL: https://github.com/myfri09/homelab
+    targetRevision: main
+    path: infrastructure/staging/metallb/namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
 # MetalLB
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -22,20 +47,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-40"
 spec:
-  project: default
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: metallb-system
-  source:
-    repoURL: https://metallb.github.io/metallb
-    chart: metallb
-    targetRevision: 0.14.*
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
       - ServerSideApply=true
   ignoreDifferences:
     - group: apiextensions.k8s.io
